@@ -1,0 +1,74 @@
+/* Author - Isaiah Nwukor
+* Problem: #68 Text Justification (HARD)
+* https://leetcode.com/problems/text-justification/
+*/
+class Solution {
+    int currentWidth = 0, wordCount = 0;
+    List<String> output = new ArrayList<String>();
+    ArrayList<String> tempArr = new ArrayList<String>();
+    public List<String> fullJustify(String[] words, int maxWidth) {
+        if (currentWidth == 0) {currentWidth = maxWidth;}
+        for (int i=0;i<words.length;i++) {
+            if (words[i].length() + 1 <= currentWidth || words[i].length() == currentWidth) {
+            if (wordCount < maxWidth) {
+                wordCount += words[i].length();
+            }
+                //FITS IN CURRENT LIST
+                currentWidth -= words[i].length() + 1;
+                tempArr.add(words[i]);
+                if (i+1 >= words.length) {
+                tempArr.add(String.valueOf(wordCount));
+                output.add(spaceJustify(tempArr, maxWidth,true));
+                }
+            } else {
+                //CURRENT LIST FULL - START NEW LIST
+                tempArr.add(String.valueOf(wordCount));
+                wordCount = 0;
+                output.add(spaceJustify(tempArr, maxWidth,false));
+                tempArr.clear();
+                i--;
+                currentWidth = maxWidth;
+            }
+        }
+        return output;
+    }
+
+    public String spaceJustify(ArrayList<String> wordList, int maxWidth, boolean isLast) {
+        String comboString = "";
+        String whiteSpace = " ";
+        int spaces = 0, spacesMod = 0;
+        int charCount = Integer.parseInt(wordList.get(wordList.size()-1));
+        wordList.remove(wordList.size()-1);
+        int numSlots = wordList.size()-1;
+        int remChars = maxWidth-charCount;
+        String[] words = new String[wordList.size()];
+        words = wordList.toArray(words);
+        if (numSlots > 0) {
+           spaces = (remChars / numSlots);
+           spacesMod = (remChars % numSlots);
+        } else {
+            spaces = remChars;
+        }
+        for(int j = 0; j < words.length; j++) {
+            if (j == 0) {
+                if ( words.length > 1) {
+                    comboString += words[j];
+                } else {
+                    comboString  +=  words[j] + whiteSpace.repeat(spaces);
+                }
+            }
+            else if (isLast) {
+                comboString  +=  whiteSpace + words[j];
+                if (j == words.length-1) {
+                    comboString  += whiteSpace.repeat(maxWidth-charCount-words.length+1);
+                }
+            } else if (spacesMod == 0) {
+                comboString  +=  whiteSpace.repeat(spaces) + words[j];
+            } else {
+                comboString  += whiteSpace.repeat(spaces+1) + words[j];
+                spacesMod--;
+            }
+        }
+        return comboString;
+    }
+}
